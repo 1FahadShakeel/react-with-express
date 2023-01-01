@@ -1,24 +1,27 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
-import "bootstrap/dist/css/bootstrap.min.css";
+const express = require("express");
+var cors = require('cors');
+const mongoose = require("mongoose");
+const authHandler = require("./middleware/auth");
+const User = require("./models/User");
+const router = require("./routes/user/user.controller");
+const routerTeacher = require("./routes/teacher/user.controller");
+const router2 = require('./routes/product/product.controller');
+const fileUpload = require('express-fileupload');
 
-import { BrowserRouter } from "react-router-dom";
-import NAV from "./Component/navigation";
 
-// import { Formik } from 'formik/dist/Formik';
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-);
+const app = express();
+app.use(express.json());
+app.use(fileUpload());
+app.use(cors());
+// app.use(authHandler);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+mongoose
+  .connect("mongodb://localhost:27017/newDb1")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((error) => console.log(`Couldn't connected to MongoDB, ${error}`));
+
+app.use("/user", router);
+app.use("/teacher", routerTeacher);
+app.use("/product", router2);
+
+app.listen(5000, () => console.log("App is listening at port 5000"));
